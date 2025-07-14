@@ -387,6 +387,7 @@ class GCNConvThr(ConvThr, GCNConvRaw):
         # propagate_type: (x: Tensor, edge_weight: OptTensor)
         self.idx_lock = self.get_idx_lock(edge_index, node_lock)
         # self.norm_all_node = torch.norm(x, dim=None) / x.shape[0]
+        # edge_weight[edge_index[0] == edge_index[1]] = 0
         out = self.propagate(edge_index, x=x, edge_weight=edge_weight, size=None)
 
         if self.bias is not None:
@@ -909,11 +910,12 @@ class SAGEConvRaw(pyg_nn.SAGEConv):
         self.logger_w.numel_after = self.lin_l.weight.numel()
         if self.root_weight:
             self.logger_w.numel_after += self.lin_r.weight.numel()
-        return super().forward(x, edge_index, edge_weight)
+        return super().forward(x, edge_index, size=None)
 
     @classmethod
     def cnt_flops(cls, module, input, output):
-        x_in, edge_index = input
+        x_in, edge_tuple = input
+        (edge_index, edge_weight) = edge_tuple
         x_out = output
         f_in, f_out = x_in.shape[-1], x_out.shape[-1]
         n, m = x_in.shape[0], edge_index.shape[1]
