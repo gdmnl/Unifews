@@ -1,16 +1,16 @@
 {
-    "data": "arxiv",
+    "data": "wisconsin",
     "path": "./data/",
     "algo": "gcn_thr",
-    "epochs": 500,
-    "patience": 50,
+    "epochs": 200,
+    "patience": 20,
     "lr": 0.001,
     "weight_decay": 1e-5,
     "layer": 2,
-    "hidden": 256,
+    "hidden": 512,
     "dropout": 0.5,
-    "thr_a": 0.5,
-    "thr_w": 0.5,
+    "thr_a": 0.0,
+    "thr_w": 0.0,
     "inductive": false,
     "multil": false
 }

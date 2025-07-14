@@ -57,11 +57,16 @@ adj, feat, labels, idx, nfeat, nclass = load_edgelist(datastr=args.data, datapat
 if args.algo.split('_')[0] in ['gcn2']:
     model = models.SandwitchThr(nlayer=args.layer, nfeat=nfeat, nhidden=args.hidden, nclass=nclass,
                         thr_a=args.thr_a, thr_w=args.thr_w, dropout=args.dropout, layer=args.algo)
+elif args.algo.split('_')[0] in ['mlp']:
+    model = models.MLP(nlayer=args.layer, nfeat=nfeat, nhidden=args.hidden, nclass=nclass,
+                        thr_w=args.thr_w, dropout=args.dropout, layer='mlp')
 else:
     model = models.GNNThr(nlayer=args.layer, nfeat=nfeat, nhidden=args.hidden, nclass=nclass,
                         thr_a=args.thr_a, thr_w=args.thr_w, dropout=args.dropout, layer=args.algo)
 model.reset_parameters()
-diag = model.kwargs['diag'] if ('_' in args.algo) else None
+model.kwargs['diag'] = None
+# diag = model.kwargs['diag'] if ('_' in args.algo) else None
+diag = model.kwargs['diag']
 adj['train'] = identity_n_norm(adj['train'], edge_weight=None, num_nodes=feat['train'].shape[0],
                     rnorm=model.kwargs['rnorm'], diag=diag)
 if logger.lvl_config > 1:
@@ -105,8 +110,8 @@ def train(x, edge_idx, y, idx_split, epoch, verbose=False):
 
 def eval(x, edge_idx, y, idx_split, verbose=False):
     model.eval()
-    # model.set_scheme('keep', 'keep')
-    model.set_scheme('full', 'keep')
+    model.set_scheme('keep', 'keep')
+    # model.set_scheme('full', 'keep')
     x, y = x.cuda(args.dev), y.cuda(args.dev)
     if isinstance(edge_idx, tuple):
         edge_idx = (edge_idx[0].cuda(args.dev), edge_idx[1].cuda(args.dev))
@@ -118,6 +123,7 @@ def eval(x, edge_idx, y, idx_split, verbose=False):
     with torch.no_grad():
         stopwatch.start()
         output = model(x, edge_idx, node_lock=idx_split, verbose=verbose)[idx_split]
+        # output = model(x, edge_idx, node_lock=torch.Tensor([]), verbose=verbose)[idx_split]
         stopwatch.pause()
 
         output = output.cpu().detach()
@@ -205,7 +211,7 @@ numel_a, numel_w = model.get_numel()
 # ========== Log
 if logger.lvl_config > 0:
     print(f"[Val] best acc: {acc_best:0.5f} (epoch: {epoch_conv}/{epoch}), [Test] best acc: {acc_test:0.5f}", flush=True)
-if logger.lvl_config > 1:
+if logger.lvl_config > 0:
     print(f"[Train] time: {time_tol.val:0.4f} s (avg: {time_tol.avg*1000:0.1f} ms), MACs: {macs_tol.val:0.3f} G (avg: {macs_tol.avg:0.1f} G)")
     print(f"[Test]  time: {time_test:0.4f} s, MACs: {macs_test:0.4f} G, Num adj: {numel_a:0.3f} k, Num weight: {numel_w:0.3f} k")
     # print(f"RAM: {mem_ram:.3f} GB, CUDA: {mem_cuda:.3f} GB, Num params: {num_param:0.4f} M, Mem params: {mem_param:0.4f} MB")

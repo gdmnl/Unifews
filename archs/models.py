@@ -261,6 +261,7 @@ class MLP(nn.Module):
         self.algo = layer
         self.threshold_w = thr_w
         self.scheme_w = 'full'
+        self.kwargs = {'rnorm': 0.5, 'diag': 1.}
 
         self.fcs = nn.ModuleList()
         if self.fbn: self.bns = nn.ModuleList()
@@ -309,10 +310,13 @@ class MLP(nn.Module):
             logger_w.numel_before = lin.weight.numel()
             logger_w.numel_after = lin.weight.numel()
 
-    def forward(self, x):
+    def forward(self, x, edge_idx, *args, **kwargs):
+        # import torch_geometric
+        # deg_inv = 1./ torch_geometric.utils.degree(edge_idx[0][0], x.shape[0])
         for i, fc in enumerate(self.fcs[:-1]):
             self.apply_prune(fc, x)
             x = fc(x)
+            # x = x * deg_inv.unsqueeze(1)
             x = self.act(x)
             if self.fbn: x = self.bns[i](x)
             x = self.dropout(x)
@@ -321,9 +325,9 @@ class MLP(nn.Module):
         x = fc(x)
         return x
 
-    def set_scheme(self, scheme_w):
+    def set_scheme(self, scheme_a, scheme_w):
         self.scheme_w = scheme_w
 
     def get_numel(self):
         numel_w = sum([fc.logger_w.numel_after for fc in self.fcs])
-        return numel_w/1e3
+        return 0, numel_w/1e3

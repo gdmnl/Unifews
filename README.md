@@ -1,5 +1,27 @@
 # Unifews
-This is the original code for *Unifews: Unified Entry-Wise Sparsification for Efficient Graph Neural Network*
+This is the original code for *Unifews: Unified Entry-Wise Sparsification for Efficient Graph Neural Network*, ICML 2025.
+
+[Conference (Poster/Video/Slides)](https://icml.cc/virtual/2025/poster/45740) | [OpenReview](https://openreview.net/forum?id=INg866tEaT) | [arXiv](https://arxiv.org/abs/2403.13268) | [GitHub](https://github.com/gdmnl/Unifews)
+
+### Citation
+
+If you find this work useful, please cite our paper:
+>  Ningyi Liao, Zihao Yu, Ruixiao Zeng, and Siqiang Luo.  
+>  Unifews: You Need Fewer Operations for Efficient Graph Neural Networks.  
+>  In Proceedings of the 42nd International Conference on Machine Learning, PMLR 267, 2025.
+```
+@inproceedings{liao2025unifews,
+  title={{Unifews}: You Need Fewer Operations for Efficient Graph Neural Networks},
+  author={Liao, Ningyi and Yu, Zihao and Ruixiao Zeng and Luo, Siqiang},
+  booktitle={42nd International Conference on Machine Learning},
+  year={2025},
+  month={May},
+  publisher={PMLR},
+  volume={267},
+  location={Vancouver, Canada},
+  url={https://icml.cc/virtual/2025/poster/45740},
+}
+```
 
 ## Dependencies
 ### Python
@@ -44,6 +66,7 @@ python run_mb.py -f [seed] -c [config_file] -v [device]
 ### Datasets
 * cora, citeseer, pubmed: [Pytorch Geometric](https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.datasets.Planetoid.html#torch_geometric.datasets.Planetoid)
 * arxiv, products, papers100m: [OGBl](https://ogb.stanford.edu/docs/home/)
+* GenCAT: [GenCAT](https://github.com/seijimaekawa/GenCAT)
 
 ### Baselines
 - [GLT](https://github.com/VITA-Group/Unified-LTH-GNN): *A Unified Lottery Ticket Hypothesis for Graph Neural Networks*
